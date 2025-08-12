@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riley - Birthday Dog | Solana Memecoin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        .pixel-art {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        .solana-gradient {
+            background: linear-gradient(90deg, #9945FF 0%, #14F195 100%);
+        }
+        .pixel-border {
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
+        }
+        .speech-bubble {
+            position: relative;
+            background: #fff;
+            border-radius: 4px;
+            padding: 12px;
+            border: 3px solid #000;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #fff transparent;
+            display: block;
+            width: 0;
+        }
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 18px;
+            border-width: 12px 12px 0;
+            border-style: solid;
+            border-color: #000 transparent;
+            display: block;
+            width: 0;
+        }
+        .pixel-button {
+            transition: all 0.1s ease;
+        }
+        .pixel-button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+        .meme-item {
+            transition: all 0.3s ease;
+        }
+        .meme-item:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .floating-coins {
+            position: absolute;
+            animation: float 3s ease-in-out infinite;
+        }
+        .confetti-paw {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 3c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1zm-12 0c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1zm6 3c-1.7 0-3 1.3-3 3v5c0 .6.4 1 1 1h4c.6 0 1-.4 1-1v-5c0-1.7-1.3-3-3-3z" fill="black"/></svg>');
+            background-size: contain;
+        }
+        /* Hamburger animation */
+        #hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        #hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+        #hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+        
+        /* Mobile menu transition */
+        #mobile-menu {
+            transition: all 0.25s ease;
+        }
+        #mobile-menu.hidden {
+            transform: translateY(-8px);
+            opacity: 0;
+        }
+        #mobile-menu:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Touch friendly items */
+        @media (max-width: 768px) {
+            #mobile-menu a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-pink-100 font-sans" style="font-family: 'Inter', sans-serif;">
+    <!-- Background elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-10 left-10 w-8 h-8 bg-yellow-300 rounded-full opacity-30 animate-float" style="animation-delay: 0s;"></div>
+        <div class="absolute top-1/4 right-20 w-6 h-6 bg-blue-300 rounded-full opacity-30 animate-float" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-20 left-1/4 w-10 h-10 bg-green-300 rounded-full opacity-30 animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/3 left-1/3 w-12 h-12 bg-purple-300 rounded-full opacity-30 animate-float" style="animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white pixel-border fixed top-4 left-4 right-4 z-50 flex justify-between items-center p-4">
+        <div class="flex items-center">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='4' y='4' width='16' height='16' rx='2' fill='%239945FF'/><circle cx='12' cy='12' r='4' fill='%2314F195'/><circle cx='12' cy='12' r='2' fill='white'/></svg>" 
+                 alt="Riley Logo" class="w-10 h-10 pixel-art mr-3">
+            <h1 class="text-2xl font-bold" style="font-family: 'Press Start 2P', cursive;">$RILEY</h1>
+        </div>
+    
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-6">
+            <a href="#about" class="text-black hover:text-purple-600 transition">About</a>
+            <a href="#buy" class="text-black hover:text-purple-600 transition">How to Buy</a>
+            <a href="#memes" class="text-black hover:text-purple-600 transition">Memes</a>
+            <a href="#community" class="text-black hover:text-purple-600 transition">Community</a>
+        </div>
+    
+        <!-- Desktop CTA -->
+        <button class="hidden md:block bg-yellow-400 text-black px-6 py-2 pixel-border pixel-button font-bold" 
+                style="font-family: 'Press Start 2P', cursive;">
+            JOIN PARTY
+        </button>
+    
+        <!-- Hamburger Button (Mobile only) -->
+        <button id="hamburger-btn" aria-label="Open menu" aria-expanded="false"
+                class="md:hidden p-2 focus:outline-none">
+            <div class="w-6 h-5 flex flex-col justify-between">
+                <span class="h-0.5 w-6 bg-black transition-all duration-300"></span>
+                <span class="h-0.5 w-6 bg-black transition-all duration-300"></span>
+                <span class="h-0.5 w-6 bg-black transition-all duration-300"></span>
+            </div>
+        </button>
+    
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-white border-t-2 border-black mt-2 shadow-lg">
+            <div class="flex flex-col space-y-2 p-4">
+                <a href="#about" class="text-black hover:text-purple-600 transition py-2">About</a>
+                <a href="#buy" class="text-black hover:text-purple-600 transition py-2">How to Buy</a>
+                <a href="#memes" class="text-black hover:text-purple-600 transition py-2">Memes</a>
+                <a href="#community" class="text-black hover:text-purple-600 transition py-2">Community</a>
+                <button class="bg-yellow-400 text-black px-4 py-2 pixel-border pixel-button font-bold w-full" 
+                        style="font-family: 'Press Start 2P', cursive; font-size: 0.85rem;">
+                    JOIN PARTY
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col justify-center items-center pt-20 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-pink-200 to-yellow-200 opacity-30 z-0"></div>
+        
+        <div class="relative z-10 text-center mb-12">
+            <h2 class="text-4xl md:text-6xl font-bold mb-6" style="font-family: 'Press Start 2P', cursive; text-shadow: 4px 4px 0 rgba(0,0,0,0.1);">
+                RILEY - BIRTHDAY DOG
+            </h2>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style="font-family: 'Press Start 2P', cursive;">
+                "Celebrate Every Block on Solana – Riley's Birthday Party Never Ends!"
+            </p>
+            <div class="flex justify-center space-x-4">
+                <button class="bg-purple-600 text-white px-8 py-3 pixel-border pixel-button font-bold" 
+                        style="font-family: 'Press Start 2P', cursive;">
+                    BUY $RILEY
+                </button>
+                <button class="bg-yellow-400 text-black px-8 py-3 pixel-border pixel-button font-bold" 
+                        style="font-family: 'Press Start 2P', cursive;">
+                    JOIN TG
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive Riley -->
+        <div class="relative z-20 cursor-pointer" id="riley-container">
+            <!-- Ganti SVG lama dengan gambar Riley baru -->
+            <img 
+                id="riley"
+                src="riley.png"
+                alt="Riley the Birthday Dog"
+                class="w-64 h-64 md:w-80 md:h-80 pixel-art mx-auto hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+                decoding="async"
+            >
+            <div class="speech-bubble absolute -top-20 left-1/2 transform -translate-x-1/2 hidden" id="riley-speech">
+                Woof! Happy Birthday!
+            </div>
+        </div>
+
+        <!-- Cake that triggers confetti -->
+        <div class="relative z-20 mt-8 cursor-pointer" id="cake-container">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'><rect x='20' y='20' width='60' height='30' rx='5' fill='%23FFC0CB'/><rect x='30' y='10' width='40' height='10' rx='5' fill='%23FF69B4'/><circle cx='40' cy='15' r='3' fill='%23FFFFFF'/><circle cx='50' cy='15' r='3' fill='%23FFFFFF'/><circle cx='60' cy='15' r='3' fill='%23FFFFFF'/><circle cx='70' cy='15' r='3' fill='%23FFFFFF'/></svg>" 
+                 alt="Birthday Cake" 
+                 class="w-24 h-16 pixel-art mx-auto hover:scale-110 transition-transform duration-300"
+                 id="cake">
+        </div>
+    </section>
+        <!-- About Section -->
+       <section id="about" class="py-20 px-4 bg-white relative">
+    <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold mb-12 text-center" style="font-family: 'Press Start 2P', cursive;">
+            ABOUT RILEY
+        </h2>
+        
+        <div class="flex flex-col md:flex-row items-center gap-12 mb-16">
+                    <div class="flex-1">
+                        <div class="speech-bubble p-6 mb-6">
+                            <p class="text-lg" style="font-family: 'Press Start 2P', cursive; font-size: 0.9rem;">
+                                "Born on Block 123456, Riley has been celebrating every block ever since!"
+                            </p>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            Riley is the happiest birthday dog on the Solana blockchain. What started as a simple celebration has turned into a never-ending party that grows with every new block.
+                        </p>
+                        <p class="text-gray-700 mb-4">
+                            The $RILEY token was created to spread joy, celebrate milestones, and create a community of fun-loving degens who appreciate the simple things in life - like cake, balloons, and good memes.
+                        </p>
+                        <p class="text-gray-700">
+                            Riley's birthday is every day, and you're always invited to the party!
+                        </p>
+                    </div>
+                    <div class="flex-1 flex justify-center">
+                        <img 
+            id="riley"
+            src="riley.png"
+            alt="Riley the Birthday Dog"
+            class="w-64 h-64 md:w-80 md:h-80 pixel-art mx-auto hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            decoding="async">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Buy Section -->
+        <section id="buy" class="py-20 px-4 bg-gradient-to-b from-purple-50 to-pink-50 relative">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl md:text-5xl font-bold mb-12 text-center" style="font-family: 'Press Start 2P', cursive;">
+                    HOW TO BUY $RILEY
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Step 1 -->
+                    <div class="bg-white p-8 rounded-lg pixel-border flex flex-col items-center text-center">
+                        <div class="w-24 h-24 mb-6 flex items-center justify-center bg-purple-100 rounded-full">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='4' width='20' height='16' rx='2' fill='%239945FF'/><circle cx='12' cy='12' r='4' fill='%2314F195'/><circle cx='12' cy='12' r='2' fill='white'/></svg>" 
+                                 alt="Wallet" class="w-16 h-16 pixel-art">
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" style="font-family: 'Press Start 2P', cursive;">STEP 1</h3>
+                        <p class="mb-4">Download Phantom Wallet from the app store or browser extension</p>
+                        <button class="mt-auto bg-purple-600 text-white px-6 py-2 pixel-border pixel-button font-bold" 
+                                style="font-family: 'Press Start 2P', cursive;">
+                            GET WALLET
+                        </button>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="bg-white p-8 rounded-lg pixel-border flex flex-col items-center text-center">
+                        <div class="w-24 h-24 mb-6 flex items-center justify-center bg-yellow-100 rounded-full">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='2' width='20' height='20' rx='2' fill='%23F5D742'/><path d='M12 6v12M6 12h12' stroke='black' stroke-width='2'/></svg>" 
+                                 alt="Swap" class="w-16 h-16 pixel-art">
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" style="font-family: 'Press Start 2P', cursive;">STEP 2</h3>
+                        <p class="mb-4">Go to Raydium or Jupiter and swap SOL for $RILEY</p>
+                        <button class="mt-auto bg-yellow-400 text-black px-6 py-2 pixel-border pixel-button font-bold" 
+                                style="font-family: 'Press Start 2P', cursive;">
+                            SWAP NOW
+                        </button>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="bg-white p-8 rounded-lg pixel-border flex flex-col items-center text-center">
+                        <div class="w-24 h-24 mb-6 flex items-center justify-center bg-pink-100 rounded-full">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='4' y='4' width='16' height='16' rx='2' fill='%23FF5733'/><circle cx='12' cy='12' r='4' fill='%23F5D742'/><path d='M8 12h8' stroke='black' stroke-width='2'/></svg>" 
+                                 alt="Party" class="w-16 h-16 pixel-art">
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" style="font-family: 'Press Start 2P', cursive;">STEP 3</h3>
+                        <p class="mb-4">Hold $RILEY and join our community for the never-ending birthday party!</p>
+                        <button class="mt-auto bg-pink-500 text-white px-6 py-2 pixel-border pixel-button font-bold" 
+                                style="font-family: 'Press Start 2P', cursive;">
+                            JOIN TG
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-16 bg-white p-8 rounded-lg pixel-border">
+                    <h3 class="text-2xl font-bold mb-6 text-center" style="font-family: 'Press Start 2P', cursive;">
+                        CONTRACT ADDRESS
+                    </h3>
+                    <div class="bg-gray-100 p-4 rounded flex items-center justify-between">
+                        <code class="font-mono text-sm md:text-base break-all">
+                            7x5hg...8d9f (example)
+                        </code>
+                        <button class="bg-purple-600 text-white px-4 py-2 rounded pixel-button" 
+                                onclick="navigator.clipboard.writeText('7x5hg...8d9f')">
+                            Copy
+                        </button>
+                    </div>
+                    <p class="text-center mt-4 text-sm text-gray-600">
+                        Always verify the contract address before purchasing!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Meme Gallery -->
+        <section id="memes" class="py-20 px-4 bg-white relative overflow-hidden">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl md:text-5xl font-bold mb-12 text-center" style="font-family: 'Press Start 2P', cursive;">
+                    RILEY MEME GALLERY
+                </h2>
+                
+                <div class="mb-8 flex justify-center">
+                    <button class="bg-purple-600 text-white px-8 py-3 pixel-border pixel-button font-bold flex items-center" 
+                            style="font-family: 'Press Start 2P', cursive;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        UPLOAD MEME
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="meme-grid">
+                    <!-- Memes will be loaded here -->
+                    <div class="meme-item bg-gray-100 rounded-lg overflow-hidden pixel-border">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23F5D742'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>WHEN MOON?</text></svg>" 
+                             alt="Riley Meme" class="w-full h-auto">
+                    </div>
+                    <div class="meme-item bg-gray-100 rounded-lg overflow-hidden pixel-border">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23FFC0CB'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>HODL FOR CAKE</text></svg>" 
+                             alt="Riley Meme" class="w-full h-auto">
+                    </div>
+                    <div class="meme-item bg-gray-100 rounded-lg overflow-hidden pixel-border">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%239945FF'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>WAGMI</text></svg>" 
+                             alt="Riley Meme" class="w-full h-auto">
+                    </div>
+                    <div class="meme-item bg-gray-100 rounded-lg overflow-hidden pixel-border">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%2314F195'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>LFG!</text></svg>" 
+                             alt="Riley Meme" class="w-full h-auto">
+                    </div>
+                    <div class="meme-item bg-gray-100 rounded-lg overflow-hidden pixel-border">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23FF5733'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>APING IN</text></svg>" 
+                             alt="Riley Meme" class="w-full h-auto">
+                    </div>
+                    <div class="meme-item bg-gray-100 rounded-lg overflow-hidden pixel-border">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23FF69B4'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>GM DEGENS</text></svg>" 
+                             alt="Riley Meme" class="w-full h-auto">
+                    </div>
+                </div>
+                
+                <div class="mt-12 text-center">
+                    <button class="bg-purple-600 text-white px-8 py-3 pixel-border pixel-button font-bold" 
+                            style="font-family: 'Press Start 2P', cursive;">
+                        LOAD MORE MEMES
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Section -->
+        <section id="community" class="py-20 px-4 bg-gradient-to-b from-purple-100 to-blue-100 relative">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl md:text-5xl font-bold mb-12 text-center" style="font-family: 'Press Start 2P', cursive;">
+                    JOIN THE PARTY
+                </h2>
+                
+                <div class="flex justify-center space-x-8 mb-16">
+                    <a href="#" class="bg-black text-white p-4 rounded-full hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="bg-blue-600 text-white p-4 rounded-full hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="bg-indigo-600 text-white p-4 rounded-full hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="bg-purple-600 text-white p-4 rounded-full hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm2.226 16.897c.047 1.414-.956 2.158-2.522 2.158h-2.145v-11.936h2.054c1.468 0 2.4.703 2.4 1.894 0 .724-.399 1.331-1.041 1.575.762.151 1.32.752 1.32 1.653 0 .947-.712 1.665-1.254 1.843.084.019.168.029.255.029.416 0 .798-.136 1.102-.363l-.046.941zm-2.226-6.666h-1.054v2.084h1.054c.585 0 .947-.341.947-.884 0-.616-.469-.947-1.053-.947-.362 0-.585 0-.894.747zm0 2.762h-1.054v2.262h.939c.656 0 1.159-.341 1.159-1.003 0-.719-.469-1.022-1.044-1.022-.047 0-.094.006-.141.006v.757z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg pixel-border max-w-4xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-6 text-center" style="font-family: 'Press Start 2P', cursive;">
+                        #RILEY ON TWITTER
+                    </h3>
+                    <div class="bg-gray-100 p-4 rounded-lg text-center min-h-40 flex items-center justify-center">
+                        <p>Loading latest $RILEY tweets...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-black text-white py-12 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center mb-6 md:mb-0">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='4' y='4' width='16' height='16' rx='2' fill='%239945FF'/><circle cx='12' cy='12' r='4' fill='%2314F195'/><circle cx='12' cy='12' r='2' fill='white'/></svg>" 
+                             alt="Riley Logo" class="w-10 h-10 pixel-art mr-3">
+                        <h2 class="text-2xl font-bold" style="font-family: 'Press Start 2P', cursive;">$RILEY</h2>
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="#" class="hover:text-purple-400 transition">Terms</a>
+                        <a href="#" class="hover:text-purple-400 transition">Privacy</a>
+                        <a href="#" class="hover:text-purple-400 transition">Disclaimer</a>
+                        <a href="#" class="hover:text-purple-400 transition">Contact</a>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
+                    <p>© 2023 Riley - Birthday Dog. All rights reserved. Not financial advice.</p>
+                    <p class="mt-2 text-sm">$RILEY is a meme coin with no intrinsic value or expectation of financial return.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Random meme popup (hidden by default) -->
+        <div id="meme-popup" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+            <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+            <div class="relative bg-white p-6 rounded-lg pixel-border max-w-md mx-4">
+                <button id="close-popup" class="absolute top-2 right-2 text-gray-500 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23F5D742'/><rect x='40' y='60' width='120' height='100' rx='15' fill='%23F5D742'/><circle cx='80' cy='100' r='20' fill='white'/><circle cx='80' cy='100' r='10' fill='black'/><circle cx='120' cy='100' r='20' fill='white'/><circle cx='120' cy='100' r='10' fill='black'/><path d='M90 140 Q100 150 110 140' stroke='black' stroke-width='4' fill='none'/><rect x='80' y='30' width='40' height='20' rx='5' fill='%23FF5733'/><text x='100' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>RANDOM MEME POPUP!</text></svg>" 
+                     alt="Random Riley Meme" class="w-full h-auto">
+            </div>
+        </div>
+
+        <script>
+            // Interactive Riley
+            const riley = document.getElementById('riley');
+            const rileyContainer = document.getElementById('riley-container');
+            const rileySpeech = document.getElementById('riley-speech');
+            const cake = document.getElementById('cake');
+            const cakeContainer = document.getElementById('cake-container');
+            const memePopup = document.getElementById('meme-popup');
+            const closePopup = document.getElementById('close-popup');
+    
+            // Accessories that can be added on hover
+            const accessories = [
+                // Glasses
+                `<rect x='60' y='80' width='80' height='20' rx='10' fill='black' opacity='0.7'/><rect x='70' y='85' width='20' height='10' fill='white'/><rect x='110' y='85' width='20' height='10' fill='white'/>`,
+                // Pizza hat
+                `<circle cx='100' cy='40' r='30' fill='%23FF5733'/><path d='M70 40 Q100 10 130 40' fill='%23F5D742' stroke='black' stroke-width='2'/><circle cx='90' cy='30' r='3' fill='%23FF5733'/><circle cx='110' cy='30' r='3' fill='%23FF5733'/><circle cx='100' cy='20' r='3' fill='%23FF5733'/>`,
+                // Banana suit
+                `<rect x='40' y='60' width='120' height='100' rx='20' fill='%23F5D742'/><rect x='40' y='60' width='120' height='20' fill='%23FFD700'/><rect x='40' y='140' width='120' height='20' fill='%23FFD700'/>`
+            ];
+    
+            // Original Riley SVG
+            const originalRiley = riley.src;
+    
+            // Click Riley to blow out candle
+            riley.addEventListener('click', function() {
+                // Change candle to smoke
+                riley.src = originalRiley.replace('id="candle-flame" style="animation: flicker 1s infinite alternate;"', 'id="candle-flame" fill="%23777777"');
+                
+                // Show speech bubble
+                rileySpeech.classList.remove('hidden');
+                setTimeout(() => {
+                    rileySpeech.classList.add('hidden');
+                }, 2000);
+                
+                // Trigger confetti
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                // Create floating Solana coins
+                for (let i = 0; i < 10; i++) {
+                    createFloatingCoin();
+                }
+                
+                // Reset candle after delay
+                setTimeout(() => {
+                    riley.src = originalRiley;
+                }, 3000);
+            });
+    
+            // Hover Riley to add random accessory
+            rileyContainer.addEventListener('mouseenter', function() {
+                const randomAccessory = accessories[Math.floor(Math.random() * accessories.length)];
+                riley.src = originalRiley.replace('<rect x="80" y="30" width="40" height="20" rx="5" fill="%23FF5733"/>', 
+                                                  `<rect x="80" y="30" width="40" height="20" rx="5" fill="%23FF5733"/>${randomAccessory}`);
+            });
+    
+            rileyContainer.addEventListener('mouseleave', function() {
+                riley.src = originalRiley;
+            });
+    
+            // Click cake for confetti
+            cake.addEventListener('click', function() {
+                // Create paw-shaped confetti
+                for (let i = 0; i < 30; i++) {
+                    createPawConfetti();
+                }
+            });
+    
+            // Create floating Solana coin animation
+            function createFloatingCoin() {
+                const coin = document.createElement('div');
+                coin.className = 'floating-coins';
+                coin.innerHTML = `<img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='4' width='20' height='16' rx='2' fill='%239945FF'/><circle cx='12' cy='12' r='4' fill='%2314F195'/><circle cx='12' cy='12' r='2' fill='white'/></svg>" 
+                                     alt="Solana Coin" class="w-8 h-8 pixel-art">`;
+                
+                // Random position at bottom
+                const startX = Math.random() * window.innerWidth;
+                coin.style.left = `${startX}px`;
+                coin.style.bottom = '-50px';
+                
+                // Random animation duration
+                const duration = 3 + Math.random() * 4;
+                coin.style.animationDuration = `${duration}s`;
+                
+                document.body.appendChild(coin);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    coin.remove();
+                }, duration * 1000);
+            }
+    
+            // Create paw-shaped confetti
+            function createPawConfetti() {
+                const paw = document.createElement('div');
+                paw.className = 'confetti-paw';
+                
+                // Random position around cake
+                const cakeRect = cakeContainer.getBoundingClientRect();
+                const cakeCenterX = cakeRect.left + cakeRect.width / 2;
+                const cakeCenterY = cakeRect.top + cakeRect.height / 2;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const startX = cakeCenterX + Math.cos(angle) * distance;
+                const startY = cakeCenterY + Math.sin(angle) * distance;
+                
+                paw.style.left = `${startX}px`;
+                paw.style.top = `${startY}px`;
+                
+                // Random animation
+                const duration = 1 + Math.random() * 2;
+                const endY = startY - 100 - Math.random() * 200;
+                const endX = startX + (Math.random() - 0.5) * 200;
+                
+                paw.style.transition = `all ${duration}s ease-out`;
+                paw.style.opacity = '1';
+                
+                document.body.appendChild(paw);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    paw.style.top = `${endY}px`;
+                    paw.style.left = `${endX}px`;
+                    paw.style.opacity = '0';
+                }, 10);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    paw.remove();
+                }, duration * 1000);
+            }
+    
+            // Show random meme popup occasionally
+            function showRandomMemePopup() {
+                const delay = 15000 + Math.random() * 30000; // 15-45 seconds
+                setTimeout(() => {
+                    memePopup.classList.remove('hidden');
+                    showRandomMemePopup(); // Schedule next popup
+                }, delay);
+            }
+    
+            // Close popup
+            closePopup.addEventListener('click', function() {
+                memePopup.classList.add('hidden');
+            });
+    
+            // Start the popup cycle
+            showRandomMemePopup();
+    
+            // Play bark sound when Riley is clicked (placeholder - would need actual audio file)
+            riley.addEventListener('click', function() {
+                // In a real implementation, you would play an 8-bit bark sound here
+                console.log("Woof! (8-bit bark sound)");
+            });
+        </script>
+    </body>
+    </html>
+    
+    <script>
+        // Hamburger Menu Toggle (Mobile)
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+    
+        if (hamburgerBtn && mobileMenu) {
+            hamburgerBtn.addEventListener('click', () => {
+                const isOpen = hamburgerBtn.classList.toggle('active');
+                mobileMenu.classList.toggle('hidden');
+                hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+    
+            // Close when clicking a link
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburgerBtn.classList.remove('active');
+                    mobileMenu.classList.add('hidden');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                });
+            });
+    
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                const clickOutside = !mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target);
+                if (clickOutside) {
+                    hamburgerBtn.classList.remove('active');
+                    mobileMenu.classList.add('hidden');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+    </script>
